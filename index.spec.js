@@ -1,13 +1,13 @@
-const { createReport } = require("./index.js");
+const { createReport } = require('./index.js');
 
-describe("createReport", () => {
-  it("should error if template is not passed", () => {
+describe('createReport', () => {
+  it('should error if template is not passed', () => {
     expect(() => {
       createReport();
     }).toThrow('required argument "template" is not passed');
   });
 
-  it("should create report", () => {
+  it('should create report', () => {
     let report;
 
     expect(() => {
@@ -17,7 +17,15 @@ describe("createReport", () => {
     expect(report).toBeDefined();
   });
 
-  it("should calculate field", () => {
+  it('should return static field', () => {
+    const report = createReport({
+      A: 42,
+    });
+
+    expect(report.A).toEqual(42);
+  });
+
+  it('should calculate field', () => {
     const report = createReport({
       A: () => 42,
     });
@@ -25,7 +33,16 @@ describe("createReport", () => {
     expect(report.A).toEqual(42);
   });
 
-  it("should calculate field based on another", () => {
+  it('should calculate field using static field', () => {
+    const report = createReport({
+      A: 42,
+      B: ({ A }) => A,
+    });
+
+    expect(report.A).toEqual(42);
+  });
+
+  it('should calculate field based on another', () => {
     const report = createReport({
       A: () => 42,
       B: ({ A }) => A + 1,
@@ -34,7 +51,7 @@ describe("createReport", () => {
     expect(report.B).toEqual(42 + 1);
   });
 
-  it("should calculate field based on two fields", () => {
+  it('should calculate field based on two fields', () => {
     const report = createReport({
       A: () => 42,
       B: () => 4,
@@ -44,7 +61,7 @@ describe("createReport", () => {
     expect(report.C).toEqual(46);
   });
 
-  it("should calculate field from a chain", () => {
+  it('should calculate field from a chain', () => {
     expect(
       createReport({
         A: () => 2,
@@ -62,7 +79,7 @@ describe("createReport", () => {
     ).toEqual(4);
   });
 
-  it("should execute field function only once", () => {
+  it('should execute field function only once', () => {
     const calculateA = jest.fn(() => 1);
 
     const report = createReport({
@@ -78,7 +95,7 @@ describe("createReport", () => {
     expect(calculateA.mock.calls.length).toEqual(1);
   });
 
-  it("should execute field only once for chained call", () => {
+  it('should execute field only once for chained call', () => {
     const calculateA = jest.fn(() => 1);
 
     const report = createReport({
@@ -95,7 +112,7 @@ describe("createReport", () => {
     expect(calculateA.mock.calls.length).toEqual(1);
   });
 
-  it("should execute field only once for chained call", () => {
+  it('should execute field only once for chained call', () => {
     const calculateA = jest.fn(() => 1);
 
     const report = createReport({

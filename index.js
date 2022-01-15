@@ -9,7 +9,9 @@ const createReport = (template) => {
       get(target, prop, receiver) {
         if (cache.has(prop)) return cache.get(prop);
 
-        const value = template[prop](proxy);
+        const field = template[prop];
+
+        const value = typeof field === 'function' ? field(proxy) : field;
 
         cache.set(prop, value);
 
