@@ -46,6 +46,10 @@ const createReport = (template) => {
         return value;
       },
       set(target, prop, value, receiver) {
+        if (isDynamic(prop)) {
+          throw new Error(`Dynamic field "${prop}" cannot be set`);
+        }
+
         cache.set(prop, value);
 
         for (const dependent of dependencyMap.get(prop) || []) {

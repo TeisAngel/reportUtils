@@ -140,6 +140,20 @@ describe('createReport', () => {
     expect(report.A).toEqual(42);
   });
 
+  it('should error if dynamic field is set', () => {
+    const report = createReport({
+      A: () => 10,
+    });
+
+    expect(report.A).toEqual(10);
+
+    expect(() => {
+      report.A = 20;
+    }).toThrow('Dynamic field "A" cannot be set');
+
+    expect(report.A).toEqual(10);
+  });
+
   it('should update calculated field if dependent static field was updated', () => {
     const report = createReport({
       A: 10,
@@ -175,5 +189,30 @@ describe('createReport', () => {
     report.B;
 
     expect(calculateB.mock.calls.length).toEqual(2);
+  });
+
+  it('should recalculate chained field only once on dependencies update', () => {
+    const calculateB = jest.fn(({ A }) => A);
+    const calculateC = jest.fn(({ B, A }) => B + A);
+
+    const report = createReport({
+      A: 1,
+      B: calculateB,
+      C: calculateC,
+    });
+
+    expect(calculateB.mock.calls.length).toEqual(0);
+    expect(calculateC.mock.calls.length).toEqual(0);
+
+    expect(report.C).toEqual(2);
+
+    expect(calculateB.mock.calls.length).toEqual(1);
+    expect(calculateC.mock.calls.length).toEqual(1);
+
+    report.A = 2;
+    expect(report.C).toEqual(4);
+
+    expect(calculateB.mock.calls.length).toEqual(2);
+    expect(calculateC.mock.calls.length).toEqual(2);
   });
 });
