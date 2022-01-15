@@ -139,4 +139,17 @@ describe('createReport', () => {
 
     expect(report.A).toEqual(42);
   });
+
+  it('should update calculated field if dependent static field was updated', () => {
+    const report = createReport({
+      A: 10,
+      B: ({ A }) => A,
+    });
+
+    expect(report.B).toEqual(10);
+
+    report.A = 42;
+
+    expect(report.B).toEqual(42);
+  });
 });
