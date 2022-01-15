@@ -23,23 +23,25 @@ const createReport = (template) => {
     {},
     {
       get(target, prop, receiver) {
+        track(prop);
+
         if (cache.has(prop)) return cache.get(prop);
 
-        track(prop);
+        effects.push(prop);
 
         const field = template[prop];
 
         let value;
 
         if (isDynamic(prop)) {
-          effects.push(prop);
           value = field(proxy);
-          effects.pop();
         } else {
           value = field;
         }
 
         cache.set(prop, value);
+
+        effects.pop();
 
         return value;
       },

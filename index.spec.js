@@ -152,4 +152,28 @@ describe('createReport', () => {
 
     expect(report.B).toEqual(42);
   });
+
+  it('should recalculate field only once on dependencies update', () => {
+    const calculateB = jest.fn(({ A }) => A);
+
+    const report = createReport({
+      A: 10,
+      B: calculateB,
+    });
+
+    expect(calculateB.mock.calls.length).toEqual(0);
+
+    report.A = 42;
+    report.B;
+
+    expect(calculateB.mock.calls.length).toEqual(1);
+
+    report.A = 12;
+
+    expect(calculateB.mock.calls.length).toEqual(1);
+
+    report.B;
+
+    expect(calculateB.mock.calls.length).toEqual(2);
+  });
 });
