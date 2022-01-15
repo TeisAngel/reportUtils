@@ -3,6 +3,8 @@ const createReport = (template) => {
 
   const cache = new Map();
 
+  const isDynamic = (prop) => typeof template[prop] === 'function';
+
   const proxy = new Proxy(
     {},
     {
@@ -11,11 +13,16 @@ const createReport = (template) => {
 
         const field = template[prop];
 
-        const value = typeof field === 'function' ? field(proxy) : field;
+        const value = isDynamic(prop) ? field(proxy) : field;
 
         cache.set(prop, value);
 
         return value;
+      },
+      set(target, prop, value, receiver) {
+        cache.set(prop, value);
+
+        return true;
       },
     }
   );

@@ -39,7 +39,7 @@ describe('createReport', () => {
       B: ({ A }) => A,
     });
 
-    expect(report.A).toEqual(42);
+    expect(report.B).toEqual(42);
   });
 
   it('should calculate field based on another', () => {
@@ -126,5 +126,17 @@ describe('createReport', () => {
     report.C;
 
     expect(calculateA.mock.calls.length).toEqual(1);
+  });
+
+  it('should update static field', () => {
+    const report = createReport({
+      A: 10,
+    });
+
+    expect(report.A).toEqual(10);
+
+    report.A = 42;
+
+    expect(report.A).toEqual(42);
   });
 });
