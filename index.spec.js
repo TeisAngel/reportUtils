@@ -215,4 +215,23 @@ describe('createReport', () => {
     expect(calculateB.mock.calls.length).toEqual(2);
     expect(calculateC.mock.calls.length).toEqual(2);
   });
+
+  it('should recalculate deeply chained field', () => {
+    const report = createReport({
+      field0: 0,
+      ...new Array(100)
+        .fill(null)
+        .reduce((acc, _, i) => {
+          acc[`field${i + 1}`] = ({ [`field${i}`]: v }) => v + 1;
+
+          return acc;
+        }, {}),
+    });
+
+    expect(report.field100).toEqual(100);
+
+    report.field0 = 100;
+
+    expect(report.field100).toEqual(200);
+  });
 });

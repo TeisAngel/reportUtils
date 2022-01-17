@@ -19,6 +19,29 @@ const createReport = (template) => {
     dependencyMap.get(dep).add(prop);
   };
 
+  const dropCache = key => {
+    const dependencies = Array.from(dependencyMap.get(key) || []);
+
+    const toDelete = new Set(dependencies);
+
+    while (dependencies.length > 0) {
+      const key = dependencies.pop();
+
+      if (dependencyMap.has(key)) {
+        const values = dependencyMap.get(key);
+
+        dependencies.push(...values);
+        toDelete.add(...values);
+      }
+    }
+
+    console.log('Deleting cache for', toDelete);
+
+    toDelete.forEach(key => {
+      cache.delete(key);
+    })
+  }
+
   const proxy = new Proxy(
     {},
     {
@@ -52,9 +75,7 @@ const createReport = (template) => {
 
         cache.set(prop, value);
 
-        for (const dependent of dependencyMap.get(prop) || []) {
-          cache.delete(dependent);
-        }
+        dropCache(prop);
 
         return true;
       },
